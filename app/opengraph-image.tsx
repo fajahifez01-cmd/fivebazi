@@ -16,24 +16,23 @@ export default function OgImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background:
-            "linear-gradient(135deg, #1f4146 0%, #2b5358 50%, #1f4146 100%)",
-          color: "#faf6ee",
+          background: "#ffffff",
+          color: "#1a1a1a",
           padding: 80,
           fontFamily: "Georgia, serif",
         }}
       >
-        {/* Bagua mark (simplified) */}
+        {/* Yin-yang mark in ink ring */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 140,
-            height: 140,
+            width: 120,
+            height: 120,
             borderRadius: "50%",
-            border: "2px solid rgba(250,246,238,0.4)",
-            marginBottom: 28,
+            border: "1.5px solid #1a1a1a",
+            marginBottom: 36,
           }}
         >
           <div
@@ -41,14 +40,8 @@ export default function OgImage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: 90,
-              height: 90,
-              borderRadius: "50%",
-              border: "2px solid #faf6ee",
-              position: "relative",
-              fontSize: 60,
-              fontWeight: 400,
-              color: "#faf6ee",
+              fontSize: 64,
+              color: "#1a1a1a",
             }}
           >
             ☯
@@ -57,11 +50,11 @@ export default function OgImage() {
 
         <div
           style={{
-            fontSize: 28,
+            fontSize: 22,
             letterSpacing: 14,
-            color: "#b8995a",
+            color: "#b89351",
             textTransform: "uppercase",
-            marginBottom: 16,
+            marginBottom: 28,
           }}
         >
           五行 · BaZi
@@ -69,23 +62,29 @@ export default function OgImage() {
 
         <div
           style={{
-            fontSize: 88,
+            fontSize: 92,
             fontWeight: 500,
-            lineHeight: 1.05,
+            lineHeight: 1.02,
             textAlign: "center",
             maxWidth: 1000,
+            letterSpacing: "-0.02em",
+            color: "#1a1a1a",
           }}
         >
           Discover your{" "}
-          <span style={{ color: "#d4be88" }}>Four Pillars</span> of Destiny
+          <span style={{ fontStyle: "italic", color: "#b89351" }}>
+            Four Pillars
+          </span>{" "}
+          of Destiny
         </div>
 
         <div
           style={{
-            fontSize: 28,
-            color: "rgba(250,246,238,0.75)",
-            marginTop: 32,
+            fontSize: 24,
+            color: "#707070",
+            marginTop: 36,
             fontFamily: "system-ui, sans-serif",
+            letterSpacing: 0,
           }}
         >
           Free Chinese astrology · in plain English · fivebazi.com

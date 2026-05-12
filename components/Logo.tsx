@@ -20,7 +20,7 @@ export default function Logo({
   style,
 }: LogoProps) {
   const color =
-    tone === "cream" ? "#faf6ee" : tone === "gold" ? "#b8995a" : "#2d2a26";
+    tone === "cream" ? "#faf6ee" : tone === "gold" ? "#b89351" : "#1a1a1a";
 
   if (variant === "horizontal") {
     return (
@@ -39,7 +39,7 @@ export default function Logo({
             lineHeight: 1,
           }}
         >
-          Five<span style={{ color: "#b8995a", margin: "0 0.04em" }}>·</span>BaZi
+          Five<span style={{ color: "#b89351", margin: "0 0.04em" }}>·</span>BaZi
         </span>
       </div>
     );

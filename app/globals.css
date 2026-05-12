@@ -4,29 +4,33 @@
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
 
-  /* Brand palette — wellness · ancient · peaceful */
-  --color-cream: #faf6ee;          /* warm off-white page bg */
-  --color-cream-soft: #f4ede0;     /* gentle card bg */
-  --color-paper: #ffffff;           /* pure white surfaces */
-  --color-ink: #2d2a26;             /* primary text */
-  --color-ink-soft: #6b6359;        /* muted text */
-  --color-teal: #1f4146;            /* deep teal (logo bg) */
-  --color-teal-soft: #2b5358;
-  --color-gold: #b8995a;            /* warm brass accent */
-  --color-gold-soft: #d4be88;
-  --color-line: #e6dccb;            /* hairline borders */
+  /* Editorial minimalist palette — white, ink, single gold accent */
+  --color-paper: #ffffff;           /* primary surface */
+  --color-cream: #ffffff;           /* alias kept for compat */
+  --color-cream-soft: #faf9f6;      /* faintest warm off-white — used for alt sections */
+  --color-ink: #1a1a1a;             /* near-black for text + primary CTAs */
+  --color-ink-soft: #707070;        /* muted text */
+  --color-line: #ececec;            /* hairline borders */
 
-  /* Five Elements (muted, wellness-aligned) */
-  --color-wood: #5b7c5a;
-  --color-wood-bg: #e8efe2;
-  --color-fire: #b86b5e;
-  --color-fire-bg: #f4e1dd;
-  --color-earth: #b89766;
-  --color-earth-bg: #f3e9d5;
-  --color-metal: #9a9285;
-  --color-metal-bg: #ecebe5;
-  --color-water: #4b6a7a;
-  --color-water-bg: #dde6ec;
+  /* Single accent — used sparingly */
+  --color-gold: #b89351;            /* warm aged-brass */
+  --color-gold-soft: #d2b378;
+
+  /* Kept for legacy references — both remapped to ink for the white aesthetic */
+  --color-teal: #1a1a1a;
+  --color-teal-soft: #2b2b2b;
+
+  /* Five Elements — desaturated wellness tones, all readable on white */
+  --color-wood: #5e7b56;
+  --color-wood-bg: #f3f6f0;
+  --color-fire: #a35b56;
+  --color-fire-bg: #f8efee;
+  --color-earth: #97774c;
+  --color-earth-bg: #f7f0e2;
+  --color-metal: #79766f;
+  --color-metal-bg: #f3f2ee;
+  --color-water: #4f677a;
+  --color-water-bg: #f0f3f5;
 }
 
 html,
@@ -40,36 +44,34 @@ html {
 }
 
 body {
-  background-color: var(--color-cream);
+  background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   font-feature-settings: "ss01", "cv02";
   -webkit-font-smoothing: antialiased;
-}
-
-/* Subtle paper grain — adds the "wellness book" warmth */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image: radial-gradient(
-    circle at 1px 1px,
-    rgba(45, 42, 38, 0.025) 1px,
-    transparent 0
-  );
-  background-size: 24px 24px;
-  opacity: 0.6;
+  letter-spacing: -0.005em;
 }
 
 main {
   position: relative;
-  z-index: 1;
 }
 
-/* Serif headings */
+/* Tasteful serif headings */
 .font-serif {
   font-family: var(--font-serif), Georgia, serif;
   font-feature-settings: "liga", "dlig";
+  letter-spacing: -0.018em;
+}
+
+/* Refined focus rings — accessibility without aggression */
+*:focus-visible {
+  outline: 1.5px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection contrast */
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
 }
