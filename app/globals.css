@@ -1,8 +1,32 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+
+  /* Brand palette — wellness · ancient · peaceful */
+  --color-cream: #faf6ee;          /* warm off-white page bg */
+  --color-cream-soft: #f4ede0;     /* gentle card bg */
+  --color-paper: #ffffff;           /* pure white surfaces */
+  --color-ink: #2d2a26;             /* primary text */
+  --color-ink-soft: #6b6359;        /* muted text */
+  --color-teal: #1f4146;            /* deep teal (logo bg) */
+  --color-teal-soft: #2b5358;
+  --color-gold: #b8995a;            /* warm brass accent */
+  --color-gold-soft: #d4be88;
+  --color-line: #e6dccb;            /* hairline borders */
+
+  /* Five Elements (muted, wellness-aligned) */
+  --color-wood: #5b7c5a;
+  --color-wood-bg: #e8efe2;
+  --color-fire: #b86b5e;
+  --color-fire-bg: #f4e1dd;
+  --color-earth: #b89766;
+  --color-earth-bg: #f3e9d5;
+  --color-metal: #9a9285;
+  --color-metal-bg: #ecebe5;
+  --color-water: #4b6a7a;
+  --color-water-bg: #dde6ec;
 }
 
 html,
@@ -10,9 +34,42 @@ body {
   height: 100%;
 }
 
-body {
-  color: #1c1917; /* stone-900 */
-  background-color: #fafaf9; /* stone-50 */
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+html {
   color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-feature-settings: "ss01", "cv02";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle paper grain — adds the "wellness book" warmth */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(45, 42, 38, 0.025) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+  opacity: 0.6;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Serif headings */
+.font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+  font-feature-settings: "liga", "dlig";
 }
