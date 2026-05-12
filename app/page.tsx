@@ -84,7 +84,13 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-stone-200/60 px-6 py-10 text-center text-sm text-stone-500">
-        <p>fivebazi.com · Chinese Astrology, simplified.</p>
+        <nav className="mb-4 flex flex-wrap justify-center gap-x-6 gap-y-2">
+          <a href="/" className="hover:text-stone-700">Home</a>
+          <a href="/about" className="hover:text-stone-700">About</a>
+          <a href="/contact" className="hover:text-stone-700">Contact</a>
+          <a href="/privacy" className="hover:text-stone-700">Privacy</a>
+        </nav>
+        <p>© {new Date().getFullYear()} fivebazi.com · Chinese Astrology, simplified.</p>
         <p className="mt-1 text-xs">
           Calculations powered by the lunar-typescript library · For educational purposes only.
         </p>
