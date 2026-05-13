@@ -24,7 +24,7 @@ export default function BaziCard({ chart, name, archetype }: Props) {
         id="bazi-card"
         className="relative w-full max-w-[380px] overflow-hidden rounded-[28px]"
         style={{
-          aspectRatio: "5 / 8.8",
+          aspectRatio: "5 / 10",
           background:
             "radial-gradient(ellipse at top, #f7ebd1 0%, #ede0bf 50%, #e2d2a3 100%)",
           boxShadow:
@@ -64,7 +64,7 @@ export default function BaziCard({ chart, name, archetype }: Props) {
             <div
               className="relative w-full overflow-hidden rounded-2xl"
               style={{
-                aspectRatio: "1 / 1",
+                aspectRatio: "4 / 5",
                 boxShadow:
                   "0 4px 20px -8px rgba(60, 40, 15, 0.3), 0 0 0 1px rgba(184, 147, 81, 0.4) inset",
               }}
@@ -72,7 +72,7 @@ export default function BaziCard({ chart, name, archetype }: Props) {
               <img
                 src={`/portraits/${chart.dayMaster.slug}.jpeg`}
                 alt={`${chart.dayMaster.label} archetype illustration`}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover object-top"
               />
               {/* Subtle vignette */}
               <div
@@ -210,7 +210,7 @@ function CardBorder({ accent }: { accent: string }) {
   return (
     <svg
       className="pointer-events-none absolute inset-0 h-full w-full"
-      viewBox="0 0 400 704"
+      viewBox="0 0 400 800"
       preserveAspectRatio="none"
       aria-hidden
     >
@@ -219,7 +219,7 @@ function CardBorder({ accent }: { accent: string }) {
         x="10"
         y="10"
         width="380"
-        height="684"
+        height="780"
         rx="22"
         fill="none"
         stroke={accent}
@@ -230,7 +230,7 @@ function CardBorder({ accent }: { accent: string }) {
         x="14"
         y="14"
         width="372"
-        height="676"
+        height="772"
         rx="20"
         fill="none"
         stroke="#b89351"
@@ -242,7 +242,7 @@ function CardBorder({ accent }: { accent: string }) {
         x="22"
         y="22"
         width="356"
-        height="660"
+        height="756"
         rx="16"
         fill="none"
         stroke="#7a5a2f"
@@ -254,8 +254,8 @@ function CardBorder({ accent }: { accent: string }) {
       {[
         { x: 22, y: 22, r: 0 },
         { x: 378, y: 22, r: 90 },
-        { x: 378, y: 682, r: 180 },
-        { x: 22, y: 682, r: 270 },
+        { x: 378, y: 778, r: 180 },
+        { x: 22, y: 778, r: 270 },
       ].map(({ x, y, r }, i) => (
         <g key={i} transform={`translate(${x} ${y}) rotate(${r})`}>
           <path
