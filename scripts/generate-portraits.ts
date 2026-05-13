@@ -1,20 +1,25 @@
 /**
  * Generate Day Master archetype portraits via Volcengine Ark (Seedream 5.0-lite).
  *
+ * Generates both male and female variants of each archetype, so the BaZi card
+ * can show a same-gender illustration regardless of which Day Master the user
+ * resolves to.
+ *
  * Usage:
- *   bun run scripts/generate-portraits.ts                  # generate all 10
- *   bun run scripts/generate-portraits.ts yang-water-ren   # one at a time
+ *   bun run scripts/generate-portraits.ts                  # all missing
+ *   bun run scripts/generate-portraits.ts yang-water-ren   # both genders of one slug
+ *   bun run scripts/generate-portraits.ts yang-water-ren:male
  *   bun run scripts/generate-portraits.ts --force          # overwrite existing
  *
  * Requires ARK_API_KEY and ARK_ENDPOINT_ID in .env.local.
- * Saves to /public/portraits/<slug>.jpeg.
+ * Saves to /public/portraits/<slug>-<gender>.jpeg.
  */
 
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { PORTRAIT_PROMPTS } from "../lib/portraitPrompts";
+import { PORTRAIT_PROMPTS, type PortraitGender } from "../lib/portraitPrompts";
 import type { DayMasterSlug } from "../lib/content/dayMasters";
 
 const API_URL = "https://ark.cn-beijing.volces.com/api/v3/images/generations";
@@ -30,11 +35,13 @@ interface SeedreamResponse {
 
 async function generateOne(
   slug: DayMasterSlug,
+  gender: PortraitGender,
   prompt: string,
   apiKey: string,
   endpointId: string,
 ): Promise<void> {
-  console.log(`\n🎨 [${slug}]`);
+  const tag = `${slug}-${gender}`;
+  console.log(`\n🎨 [${tag}]`);
   console.log(`   prompt: ${prompt.slice(0, 60)}…`);
 
   const res = await fetch(API_URL, {
@@ -77,11 +84,33 @@ async function generateOne(
   }
 
   const buf = Buffer.from(await imgRes.arrayBuffer());
-  const outPath = join(OUTPUT_DIR, `${slug}.jpeg`);
+  const outPath = join(OUTPUT_DIR, `${tag}.jpeg`);
   await writeFile(outPath, buf);
 
   const tokens = json.usage?.output_tokens ?? 0;
   console.log(`   ✓ saved → ${outPath} (${Math.round(buf.length / 1024)} KB, ${tokens} tokens)`);
+}
+
+interface Target {
+  slug: DayMasterSlug;
+  gender: PortraitGender;
+}
+
+function parseTargets(argv: string[]): Target[] | "all" {
+  const explicit = argv.filter((a) => !a.startsWith("--"));
+  if (explicit.length === 0) return "all";
+
+  const out: Target[] = [];
+  for (const arg of explicit) {
+    if (arg.includes(":")) {
+      const [slug, gender] = arg.split(":") as [DayMasterSlug, PortraitGender];
+      out.push({ slug, gender });
+    } else {
+      out.push({ slug: arg as DayMasterSlug, gender: "male" });
+      out.push({ slug: arg as DayMasterSlug, gender: "female" });
+    }
+  }
+  return out;
 }
 
 async function main() {
@@ -98,12 +127,20 @@ async function main() {
 
   const argv = process.argv.slice(2);
   const force = argv.includes("--force");
-  const explicitSlugs = argv.filter((a) => !a.startsWith("--"));
+  const parsed = parseTargets(argv);
 
-  const allSlugs = Object.keys(PORTRAIT_PROMPTS) as DayMasterSlug[];
-  const slugs = explicitSlugs.length > 0 ? (explicitSlugs as DayMasterSlug[]) : allSlugs;
+  let targets: Target[];
+  if (parsed === "all") {
+    const slugs = Object.keys(PORTRAIT_PROMPTS) as DayMasterSlug[];
+    targets = slugs.flatMap((slug) => [
+      { slug, gender: "male" as const },
+      { slug, gender: "female" as const },
+    ]);
+  } else {
+    targets = parsed;
+  }
 
-  console.log(`\n🚀 Generating ${slugs.length} portrait(s)`);
+  console.log(`\n🚀 Generating ${targets.length} portrait(s)`);
   if (!force) {
     console.log(`   (skipping existing — pass --force to overwrite)`);
   }
@@ -112,26 +149,35 @@ async function main() {
   let skipped = 0;
   let failed = 0;
 
-  for (const slug of slugs) {
-    const prompt = PORTRAIT_PROMPTS[slug];
-    if (!prompt) {
+  for (const { slug, gender } of targets) {
+    const variants = PORTRAIT_PROMPTS[slug];
+    if (!variants) {
       console.error(`\n⚠️  Unknown slug: ${slug}`);
       failed++;
       continue;
     }
+    const prompt = variants[gender];
+    if (!prompt) {
+      console.error(`\n⚠️  No prompt for ${slug}:${gender}`);
+      failed++;
+      continue;
+    }
 
-    const outPath = join(OUTPUT_DIR, `${slug}.jpeg`);
+    const outPath = join(OUTPUT_DIR, `${slug}-${gender}.jpeg`);
     if (existsSync(outPath) && !force) {
-      console.log(`\n⏭  [${slug}] already exists, skipping (use --force to overwrite)`);
+      console.log(`\n⏭  [${slug}-${gender}] already exists, skipping`);
       skipped++;
       continue;
     }
 
     try {
-      await generateOne(slug, prompt, apiKey, endpointId);
+      await generateOne(slug, gender, prompt, apiKey, endpointId);
       ok++;
     } catch (err) {
-      console.error(`\n❌ [${slug}] failed:`, err instanceof Error ? err.message : err);
+      console.error(
+        `\n❌ [${slug}-${gender}] failed:`,
+        err instanceof Error ? err.message : err,
+      );
       failed++;
     }
 

@@ -1,4 +1,5 @@
 import type { BaZiChart, Element } from "@/lib/bazi";
+import { DAY_MASTERS } from "@/lib/content/dayMasters";
 
 const ELEMENT_HEX: Record<Element, string> = {
   Wood:  "#5e7b56",
@@ -16,6 +17,8 @@ interface Props {
 
 export default function BaziCard({ chart, name, archetype }: Props) {
   const dmColor = ELEMENT_HEX[chart.dayMaster.element];
+  const gender = chart.isMale ? "male" : "female";
+  const oneLine = DAY_MASTERS[chart.dayMaster.slug].oneLine;
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -24,7 +27,7 @@ export default function BaziCard({ chart, name, archetype }: Props) {
         id="bazi-card"
         className="relative w-full max-w-[380px] overflow-hidden rounded-[28px]"
         style={{
-          aspectRatio: "5 / 10",
+          aspectRatio: "5 / 10.8",
           background:
             "radial-gradient(ellipse at top, #f7ebd1 0%, #ede0bf 50%, #e2d2a3 100%)",
           boxShadow:
@@ -70,7 +73,7 @@ export default function BaziCard({ chart, name, archetype }: Props) {
               }}
             >
               <img
-                src={`/portraits/${chart.dayMaster.slug}.jpeg`}
+                src={`/portraits/${chart.dayMaster.slug}-${gender}.jpeg`}
                 alt={`${chart.dayMaster.label} archetype illustration`}
                 className="h-full w-full object-cover object-top"
               />
@@ -103,6 +106,15 @@ export default function BaziCard({ chart, name, archetype }: Props) {
               border: "1px solid rgba(120, 85, 35, 0.18)",
             }}
           >
+            <div
+              className="mb-2 border-b pb-2 text-center text-[10px] leading-snug italic"
+              style={{
+                borderColor: "rgba(120, 85, 35, 0.15)",
+                color: "#5a4220",
+              }}
+            >
+              {chartEssence(chart)}
+            </div>
             <div className="grid grid-cols-4 gap-1 text-center">
               {[
                 { label: "Year",  data: chart.year },
@@ -124,20 +136,17 @@ export default function BaziCard({ chart, name, archetype }: Props) {
                     {data.stem}
                     {data.branch}
                   </div>
-                  <div className="text-[8px]" style={{ color: "#7a5a2f" }}>
-                    {data.stemPinyin.slice(0, 3)}·{data.branchPinyin.slice(0, 3)}
+                  <div
+                    className="mt-1 text-[8px] leading-tight"
+                    style={{ color: "#7a5a2f" }}
+                  >
+                    <div>
+                      {data.stemYinYang} {data.stemElement}
+                    </div>
+                    <div>{data.animal}</div>
                   </div>
                 </div>
               ))}
-            </div>
-            <div
-              className="mt-2 border-t pt-2 text-center text-[10px] leading-snug"
-              style={{
-                borderColor: "rgba(120, 85, 35, 0.15)",
-                color: "#5a4220",
-              }}
-            >
-              {elementSummary(chart)}
             </div>
           </div>
 
@@ -163,7 +172,13 @@ export default function BaziCard({ chart, name, archetype }: Props) {
               {archetype}
             </p>
             <p
-              className="mt-1 text-[10px]"
+              className="mx-2 mt-1.5 text-[11px] italic leading-snug"
+              style={{ color: "#5a4220" }}
+            >
+              {oneLine}
+            </p>
+            <p
+              className="mt-2 text-[10px]"
               style={{ color: "#8a6b3a" }}
             >
               Year of the {chart.zodiac} · {chart.isMale ? "Yang" : "Yin"} chart
@@ -210,7 +225,7 @@ function CardBorder({ accent }: { accent: string }) {
   return (
     <svg
       className="pointer-events-none absolute inset-0 h-full w-full"
-      viewBox="0 0 400 800"
+      viewBox="0 0 400 864"
       preserveAspectRatio="none"
       aria-hidden
     >
@@ -219,7 +234,7 @@ function CardBorder({ accent }: { accent: string }) {
         x="10"
         y="10"
         width="380"
-        height="780"
+        height="844"
         rx="22"
         fill="none"
         stroke={accent}
@@ -230,7 +245,7 @@ function CardBorder({ accent }: { accent: string }) {
         x="14"
         y="14"
         width="372"
-        height="772"
+        height="836"
         rx="20"
         fill="none"
         stroke="#b89351"
@@ -242,7 +257,7 @@ function CardBorder({ accent }: { accent: string }) {
         x="22"
         y="22"
         width="356"
-        height="756"
+        height="820"
         rx="16"
         fill="none"
         stroke="#7a5a2f"
@@ -254,8 +269,8 @@ function CardBorder({ accent }: { accent: string }) {
       {[
         { x: 22, y: 22, r: 0 },
         { x: 378, y: 22, r: 90 },
-        { x: 378, y: 778, r: 180 },
-        { x: 22, y: 778, r: 270 },
+        { x: 378, y: 842, r: 180 },
+        { x: 22, y: 842, r: 270 },
       ].map(({ x, y, r }, i) => (
         <g key={i} transform={`translate(${x} ${y}) rotate(${r})`}>
           <path
@@ -274,23 +289,20 @@ function CardBorder({ accent }: { accent: string }) {
 
 /* ───── Helpers ───── */
 
-function elementSummary(chart: BaZiChart): string {
+const ESSENCE_PHRASE: Record<Element, string> = {
+  Wood: "builds slowly, lasts long",
+  Fire: "radiant, sometimes burns",
+  Earth: "steady, deeply trusted",
+  Metal: "sharp, decisive cuts",
+  Water: "adaptive, hard to read",
+};
+
+function chartEssence(chart: BaZiChart): string {
   const ranked = chart.elementsRanked;
   const top = ranked[0];
   const bottom = ranked[ranked.length - 1];
   if (!top || !bottom) return "";
-  const strongStr = ranked
-    .filter((r) => r.count >= 3)
-    .map((r) => r.element)
-    .join(" · ");
-  const weakStr = ranked
-    .filter((r) => r.count <= 1)
-    .map((r) => r.element)
-    .join(" · ");
-  if (strongStr && weakStr) {
-    return `${strongStr} strong  ·  ${weakStr} weak`;
-  }
-  return `${top.element} dominant · balance with ${bottom.element}`;
+  return `${top.element}-forged, ${bottom.element}-light — ${ESSENCE_PHRASE[top.element]}.`;
 }
 
 function darken(hex: string): string {
