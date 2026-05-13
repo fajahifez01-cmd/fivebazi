@@ -1,5 +1,7 @@
 import { Solar } from "lunar-typescript";
 
+import type { DayMasterSlug } from "@/lib/content/dayMasters";
+
 const STEM_ELEMENT: Record<string, "Wood" | "Fire" | "Earth" | "Metal" | "Water"> = {
   甲: "Wood", 乙: "Wood",
   丙: "Fire", 丁: "Fire",
@@ -39,7 +41,7 @@ const BRANCH_ANIMAL: Record<string, string> = {
 };
 
 /** Slug for routing + portrait file lookup. Matches lib/content/dayMasters.ts. */
-const STEM_TO_SLUG: Record<string, string> = {
+const STEM_TO_SLUG: Record<string, DayMasterSlug> = {
   甲: "yang-wood-jia",
   乙: "yin-wood-yi",
   丙: "yang-fire-bing",
@@ -79,7 +81,7 @@ export interface BaZiChart {
     /** e.g. "Yang Wood Jiǎ" */
     label: string;
     /** e.g. "yang-wood-jia" — used for routing and asset lookup */
-    slug: string;
+    slug: DayMasterSlug;
   };
   elementCounts: Record<Element, number>;
   /** Sorted descending — useful for quick UI listing. */
