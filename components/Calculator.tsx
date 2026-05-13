@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { calculateBaZi, type BaZiChart, type Element } from "@/lib/bazi";
 import { generateReading } from "@/lib/reading";
+import BaziCard from "./BaziCard";
 
 const ELEMENT_THEME: Record<Element, { bg: string; fg: string; bar: string }> = {
   Wood:  { bg: "bg-wood-bg",  fg: "text-wood",  bar: "bg-wood" },
@@ -20,6 +21,7 @@ function range(start: number, end: number): number[] {
 
 export default function Calculator() {
   const now = new Date();
+  const [name, setName] = useState("");
   const [year, setYear] = useState(1990);
   const [month, setMonth] = useState(5);
   const [day, setDay] = useState(15);
@@ -27,11 +29,13 @@ export default function Calculator() {
   const [minute, setMinute] = useState(0);
   const [isMale, setIsMale] = useState(true);
   const [chart, setChart] = useState<BaZiChart | null>(null);
+  const [submittedName, setSubmittedName] = useState("");
   const [pending, startTransition] = useTransition();
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(() => {
+      setSubmittedName(name.trim() || "Anonymous Soul");
       setChart(calculateBaZi({ year, month, day, hour, minute, isMale }));
       setTimeout(() => {
         document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -45,6 +49,23 @@ export default function Calculator() {
         onSubmit={onSubmit}
         className="rounded-3xl border border-line bg-paper p-6 shadow-[0_2px_30px_rgba(45,42,38,0.04)] sm:p-9"
       >
+        <div className="mb-5">
+          <label
+            htmlFor="bazi-name"
+            className="block text-xs font-medium uppercase tracking-[0.18em] text-ink-soft"
+          >
+            Your name
+          </label>
+          <input
+            id="bazi-name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="(Optional — will appear on your card)"
+            maxLength={32}
+            className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 font-serif text-base text-ink shadow-sm focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+          />
+        </div>
         <div className="grid gap-5 sm:grid-cols-3">
           <SelectField label="Year"   value={year}   onChange={setYear}   options={range(1920, now.getFullYear())} />
           <SelectField label="Month"  value={month}  onChange={setMonth}  options={range(1, 12)} />
@@ -96,7 +117,7 @@ export default function Calculator() {
         </p>
       </form>
 
-      {chart && <Result chart={chart} />}
+      {chart && <Result chart={chart} name={submittedName} />}
     </div>
   );
 }
@@ -130,7 +151,7 @@ function SelectField<T extends number>({
   );
 }
 
-function Result({ chart }: { chart: BaZiChart }) {
+function Result({ chart, name }: { chart: BaZiChart; name: string }) {
   const reading = generateReading(chart);
   const pillars: Array<{ label: string; data: typeof chart.year }> = [
     { label: "Year",  data: chart.year },
@@ -140,25 +161,16 @@ function Result({ chart }: { chart: BaZiChart }) {
   ];
 
   return (
-    <section id="result" className="mt-12 space-y-10">
-      {/* Day Master headline */}
-      <div className="overflow-hidden rounded-3xl border border-line bg-paper">
-        <div className="bg-teal px-8 py-2 text-center">
-          <p className="text-xs uppercase tracking-[0.35em] text-cream/70">
-            Your Day Master
-          </p>
-        </div>
-        <div className="px-8 py-10 text-center">
-          <p className="font-serif text-5xl font-medium text-ink sm:text-6xl">
-            {chart.dayMaster.label}
-          </p>
-          <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-ink-soft">
-            <span className="font-serif text-xl text-gold">{reading.archetype}</span>
-            <br />
-            <span>{reading.archetypeBlurb}.</span>
-          </p>
-          <p className="mt-3 text-sm text-ink-soft">{reading.zodiacLine}</p>
-        </div>
+    <section id="result" className="mt-12 space-y-12">
+      {/* BaZi Destiny Card — the hero output */}
+      <div className="flex flex-col items-center">
+        <p className="mb-4 text-xs font-medium uppercase tracking-[0.35em] text-gold">
+          Your Destiny Card
+        </p>
+        <BaziCard chart={chart} name={name} archetype={reading.archetype} />
+        <p className="mt-4 text-xs text-ink-soft">
+          ✦ Save · share · screenshot ✦
+        </p>
       </div>
 
       {/* Four Pillars */}
