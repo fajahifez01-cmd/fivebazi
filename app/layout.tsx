@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const ADSENSE_CLIENT = "ca-pub-4396480398414680";
@@ -71,12 +70,13 @@ export default function RootLayout({
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
-        <Script
-          id="adsbygoogle"
+        {/* AdSense verification needs a plain <script> tag in source HTML.
+            React 19 + Next.js will hoist this into <head> and emit it as-is
+            (not as a preload + runtime inject like next/script does). */}
+        <script
           async
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
