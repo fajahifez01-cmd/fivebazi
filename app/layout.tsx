@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+
+const ADSENSE_CLIENT = "ca-pub-4396480398414680";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-serif",
@@ -67,6 +70,15 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <Script
+          id="adsbygoogle"
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
         {children}
       </body>
