@@ -38,6 +38,20 @@ const BRANCH_ANIMAL: Record<string, string> = {
   申: "Monkey", 酉: "Rooster", 戌: "Dog", 亥: "Pig",
 };
 
+/** Slug for routing + portrait file lookup. Matches lib/content/dayMasters.ts. */
+const STEM_TO_SLUG: Record<string, string> = {
+  甲: "yang-wood-jia",
+  乙: "yin-wood-yi",
+  丙: "yang-fire-bing",
+  丁: "yin-fire-ding",
+  戊: "yang-earth-wu",
+  己: "yin-earth-ji",
+  庚: "yang-metal-geng",
+  辛: "yin-metal-xin",
+  壬: "yang-water-ren",
+  癸: "yin-water-gui",
+};
+
 export type Element = "Wood" | "Fire" | "Earth" | "Metal" | "Water";
 
 export interface Pillar {
@@ -64,6 +78,8 @@ export interface BaZiChart {
     yinYang: "Yang" | "Yin";
     /** e.g. "Yang Wood Jiǎ" */
     label: string;
+    /** e.g. "yang-wood-jia" — used for routing and asset lookup */
+    slug: string;
   };
   elementCounts: Record<Element, number>;
   /** Sorted descending — useful for quick UI listing. */
@@ -139,6 +155,7 @@ export function calculateBaZi(input: {
       element: day.stemElement,
       yinYang: day.stemYinYang,
       label: `${day.stemYinYang} ${day.stemElement} ${day.stemPinyin}`,
+      slug: STEM_TO_SLUG[day.stem]!,
     },
     elementCounts: counts,
     elementsRanked,
