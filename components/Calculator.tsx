@@ -5,6 +5,7 @@ import { calculateBaZi, type BaZiChart, type Element } from "@/lib/bazi";
 import { generateReading } from "@/lib/reading";
 import BaziCard from "./BaziCard";
 import AIReading from "./AIReading";
+import ShareButton from "./ShareButton";
 
 const ELEMENT_THEME: Record<Element, { bg: string; fg: string; bar: string }> = {
   Wood:  { bg: "bg-wood-bg",  fg: "text-wood",  bar: "bg-wood" },
@@ -169,9 +170,10 @@ function Result({ chart, name }: { chart: BaZiChart; name: string }) {
           Your Destiny Card
         </p>
         <BaziCard chart={chart} name={name} archetype={reading.archetype} />
-        <p className="mt-4 text-xs text-ink-soft">
-          ✦ Save · share · screenshot ✦
-        </p>
+        <ShareButton
+          cardId="bazi-card"
+          filename={`${(name || "anonymous").toLowerCase().replace(/\s+/g, "-")}-${chart.dayMaster.slug}-bazi`}
+        />
       </div>
 
       {/* AI Reading — Claude-generated personalized analysis */}

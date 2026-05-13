@@ -183,6 +183,12 @@ export default function BaziCard({ chart, name, archetype }: Props) {
             >
               Year of the {chart.zodiac} · {chart.isMale ? "Yang" : "Yin"} chart
             </p>
+            <p
+              className="mt-1.5 text-[9px] tracking-[0.25em]"
+              style={{ color: "#a98850" }}
+            >
+              FIVEBAZI.COM
+            </p>
           </div>
         </div>
       </div>
