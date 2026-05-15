@@ -6,6 +6,7 @@ import { generateReading } from "@/lib/reading";
 import BaziCard from "./BaziCard";
 import AIReading from "./AIReading";
 import ShareButton from "./ShareButton";
+import PremiumCardOffer from "./PremiumCardOffer";
 
 const ELEMENT_THEME: Record<Element, { bg: string; fg: string; bar: string }> = {
   Wood:  { bg: "bg-wood-bg",  fg: "text-wood",  bar: "bg-wood" },
@@ -175,6 +176,9 @@ function Result({ chart, name }: { chart: BaZiChart; name: string }) {
           filename={`${(name || "anonymous").toLowerCase().replace(/\s+/g, "-")}-${chart.dayMaster.slug}-bazi`}
         />
       </div>
+
+      {/* Premium Card Offer — paid face-swap onto archetype */}
+      <PremiumCardOffer chart={chart} />
 
       {/* AI Reading — Claude-generated personalized analysis */}
       <AIReading chart={chart} name={name} />
