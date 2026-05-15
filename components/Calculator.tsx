@@ -6,11 +6,7 @@ import { generateReading } from "@/lib/reading";
 import BaziCard from "./BaziCard";
 import AIReading from "./AIReading";
 import ShareButton from "./ShareButton";
-// PremiumCardOffer is temporarily not rendered — regrouping into a paid
-// package with the 8000-word deep reading. Backend (api/face-swap/*,
-// netlify/functions/face-swap-generate-background) and the component
-// itself are kept for the package work.
-// import PremiumCardOffer from "./PremiumCardOffer";
+import PremiumPaywall from "./PremiumPaywall";
 
 const ELEMENT_THEME: Record<Element, { bg: string; fg: string; bar: string }> = {
   Wood:  { bg: "bg-wood-bg",  fg: "text-wood",  bar: "bg-wood" },
@@ -181,17 +177,11 @@ function Result({ chart, name }: { chart: BaZiChart; name: string }) {
         />
       </div>
 
-      {/* AI Reading — Claude-generated personalized analysis */}
+      {/* AI Reading — Claude-generated personalized analysis (free 800-word) */}
       <AIReading chart={chart} name={name} />
 
-      {/*
-        Premium Card Offer (face-swap onto archetype) is wired but temporarily
-        not rendered. We're regrouping it into a Premium Package ($9.9) with
-        the 8000-word deep reading rather than selling it standalone — the
-        single face-swap wasn't compelling enough at that price point alone.
-        Backend pipeline (start / status / background fn / Blobs) stays in place.
-      */}
-      {/* <PremiumCardOffer chart={chart} /> */}
+      {/* Premium Destiny Report — $9.9 paywall */}
+      <PremiumPaywall chart={chart} defaultName={name} />
 
       {/* Four Pillars */}
       <div>

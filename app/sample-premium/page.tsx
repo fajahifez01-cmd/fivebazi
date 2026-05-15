@@ -28,6 +28,7 @@ export default function SamplePremiumPage() {
       chart={chart}
       name="Harry"
       reading={sampleData as PremiumReading}
+      awakenedPortraitPath={`/portraits/${chart.dayMaster.slug}-male-awakened.jpeg`}
     />
   );
 }

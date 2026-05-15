@@ -10,13 +10,20 @@ interface Props {
   chart: BaZiChart;
   name: string;
   reading: PremiumReading;
+  /** Path to the awakened portrait, e.g. "/portraits/yang-metal-geng-male-awakened.jpeg" */
+  awakenedPortraitPath?: string;
 }
 
 /**
  * Full premium report layout: hero tagline + radar chart + 6 deep-dive sections.
  * Designed to be the body of the $9.9 paywalled output page (or the PDF/email).
  */
-export default function PremiumReport({ chart, name, reading }: Props) {
+export default function PremiumReport({
+  chart,
+  name,
+  reading,
+  awakenedPortraitPath,
+}: Props) {
   return (
     <article className="mx-auto max-w-3xl space-y-12 px-4 py-10">
       {/* Hero */}
@@ -28,8 +35,21 @@ export default function PremiumReport({ chart, name, reading }: Props) {
           For {name || "Anonymous Soul"}
         </h1>
         <p className="text-sm uppercase tracking-widest text-ink-soft">
-          {chart.dayMaster.label} · Year of the {chart.zodiac}
+          {chart.dayMaster.label} · Awakened · Year of the {chart.zodiac}
         </p>
+
+        {/* Awakened portrait — the visual hero unlocked by purchase */}
+        {awakenedPortraitPath && (
+          <div className="mx-auto mt-6 max-w-md overflow-hidden rounded-2xl border border-gold/40 shadow-xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={awakenedPortraitPath}
+              alt={`${chart.dayMaster.label} awakened form`}
+              className="block w-full"
+            />
+          </div>
+        )}
+
         <p className="mx-auto max-w-xl font-serif text-lg italic leading-relaxed text-ink">
           {reading.tagline}
         </p>
@@ -85,13 +105,7 @@ export default function PremiumReport({ chart, name, reading }: Props) {
               </p>
             </div>
           </div>
-          <div className="space-y-4 font-serif text-base leading-relaxed text-ink/90 sm:text-lg">
-            {reading.narratives[dim]
-              .split(/\n\s*\n/)
-              .map((para, i) => (
-                <p key={i}>{para.trim()}</p>
-              ))}
-          </div>
+          <NarrativeBlock text={reading.narratives[dim]} />
         </section>
       ))}
 
@@ -100,5 +114,36 @@ export default function PremiumReport({ chart, name, reading }: Props) {
         ✦ fivebazi.com · Premium Destiny Report ✦
       </footer>
     </article>
+  );
+}
+
+/**
+ * Renders a narrative. The model is instructed to put a one-sentence
+ * **bold** summary as the first paragraph; we render that as a larger,
+ * weighted lede so skimmers get the punchline without reading the rest.
+ */
+function NarrativeBlock({ text }: { text: string }) {
+  const paras = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const [first, ...rest] = paras;
+
+  // Strip the markdown ** wrappers; visual treatment handles emphasis.
+  const lede = first?.replace(/^\*\*\s*/, "").replace(/\s*\*\*$/, "") ?? "";
+
+  return (
+    <div className="space-y-4 font-serif text-ink/90">
+      {lede && (
+        <p
+          className="border-l-2 pl-4 font-serif text-lg font-semibold leading-snug text-ink sm:text-xl"
+          style={{ borderColor: "rgba(184, 147, 81, 0.5)" }}
+        >
+          {lede}
+        </p>
+      )}
+      {rest.map((para, i) => (
+        <p key={i} className="text-base leading-relaxed sm:text-lg">
+          {para}
+        </p>
+      ))}
+    </div>
   );
 }
