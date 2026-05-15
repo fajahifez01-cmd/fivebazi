@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { ELEMENT_LIST } from "@/lib/content/elements";
 import { DAY_MASTER_LIST } from "@/lib/content/dayMasters";
 import { ZODIAC_LIST } from "@/lib/content/zodiac";
+import { ARTICLE_LIST } from "@/lib/content/articles";
 
 const SITE = "https://fivebazi.com";
 
@@ -10,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${SITE}/`,           lastModified, changeFrequency: "weekly",  priority: 1.0 },
+    { url: `${SITE}/learn`,      lastModified, changeFrequency: "weekly",  priority: 0.9 },
     { url: `${SITE}/element`,    lastModified, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE}/day-master`, lastModified, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE}/zodiac`,     lastModified, changeFrequency: "monthly", priority: 0.8 },
@@ -39,5 +41,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...elementPages, ...dayMasterPages, ...zodiacPages];
+  const articlePages: MetadataRoute.Sitemap = ARTICLE_LIST.map((a) => ({
+    url: `${SITE}/learn/${a.slug}`,
+    lastModified: new Date(a.publishedAt),
+    changeFrequency: "monthly",
+    priority: 0.75,
+  }));
+
+  return [
+    ...staticPages,
+    ...elementPages,
+    ...dayMasterPages,
+    ...zodiacPages,
+    ...articlePages,
+  ];
 }

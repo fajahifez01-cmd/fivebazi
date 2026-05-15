@@ -18,6 +18,7 @@ export default function Footer() {
               <li><a href="/day-master" className="hover:text-cream">Day Masters</a></li>
               <li><a href="/zodiac" className="hover:text-cream">Chinese Zodiac</a></li>
               <li><a href="/element" className="hover:text-cream">Five Elements</a></li>
+              <li><a href="/learn" className="hover:text-cream">Learn (Guides)</a></li>
             </ul>
           </div>
 
