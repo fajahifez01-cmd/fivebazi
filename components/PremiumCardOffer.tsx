@@ -47,51 +47,51 @@ export default function PremiumCardOffer({ chart }: Props) {
     setElapsed(0);
 
     try {
-      const res = await fetch("/api/face-swap", {
+      // 1. Kick off the background job
+      const startRes = await fetch("/api/face-swap/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          photoDataUrl,
-          daySlug: slug,
-          gender,
-        }),
+        body: JSON.stringify({ photoDataUrl, daySlug: slug, gender }),
       });
-
-      if (!res.ok || !res.body) {
-        const j = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(j?.error ?? `Request failed (HTTP ${res.status})`);
+      if (!startRes.ok) {
+        const j = (await startRes.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(j?.error ?? `Start failed (HTTP ${startRes.status})`);
       }
+      const { jobId } = (await startRes.json()) as { jobId: string };
 
-      // Stream of NDJSON events: {type:"progress",elapsed} or {type:"done",imageUrl} or {type:"error",message}
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
+      // 2. Poll status every 3 seconds
+      const startTime = Date.now();
+      const MAX_WAIT_MS = 3 * 60 * 1000; // 3 min hard cap
+
       while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          let event: { type: string; elapsed?: number; imageUrl?: string; message?: string };
-          try {
-            event = JSON.parse(line);
-          } catch {
-            continue;
-          }
-          if (event.type === "progress" && typeof event.elapsed === "number") {
-            setElapsed(event.elapsed);
-          } else if (event.type === "done" && event.imageUrl) {
-            setResultUrl(event.imageUrl);
-            setStatus("ready");
-            return;
-          } else if (event.type === "error") {
-            throw new Error(event.message ?? "Generation failed");
-          }
+        await new Promise((r) => setTimeout(r, 3000));
+        const waited = Date.now() - startTime;
+        setElapsed(Math.round(waited / 1000));
+
+        if (waited > MAX_WAIT_MS) {
+          throw new Error("Generation took longer than 3 minutes — please try again.");
         }
+
+        const statusRes = await fetch(`/api/face-swap/status/${jobId}`);
+        if (!statusRes.ok) {
+          throw new Error(`Status check failed (HTTP ${statusRes.status})`);
+        }
+        const job = (await statusRes.json()) as {
+          status: "pending" | "processing" | "done" | "error";
+          imageUrl?: string;
+          message?: string;
+        };
+
+        if (job.status === "done" && job.imageUrl) {
+          setResultUrl(job.imageUrl);
+          setStatus("ready");
+          return;
+        }
+        if (job.status === "error") {
+          throw new Error(job.message ?? "Generation failed");
+        }
+        // pending or processing — keep polling
       }
-      throw new Error("Stream ended without a result");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed.");
       setStatus("error");
