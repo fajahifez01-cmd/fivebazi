@@ -92,9 +92,10 @@ export function publicOrderView(order: PremiumOrder) {
     reading: order.reading,
     awakenedPortraitPath: order.awakenedPortraitPath,
     errorMessage: order.errorMessage,
+    emailSent: order.emailSent,
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
-    // intentionally not exposing email or chartInput
+    // intentionally not exposing the raw email address or chartInput
   };
 }
 

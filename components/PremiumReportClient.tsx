@@ -16,6 +16,7 @@ interface OrderView {
   reading?: PremiumReading;
   awakenedPortraitPath?: string;
   errorMessage?: string;
+  emailSent?: boolean;
   createdAt: number;
   updatedAt: number;
 }
@@ -87,12 +88,41 @@ export default function PremiumReportClient({ orderId }: Props) {
   if (order.status === "error") {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center">
-        <p className="font-serif text-2xl text-ink">Generation failed</p>
-        <p className="mt-3 text-sm text-ink-soft">
-          {order.errorMessage ?? "Something went wrong — please contact support."}
+        <p className="text-xs font-medium uppercase tracking-[0.4em] text-gold">
+          ✦ Generation failed ✦
         </p>
-        <p className="mt-2 text-xs text-ink-soft">
+        <p className="mt-6 font-serif text-2xl text-ink">
+          We couldn't finish your reading
+        </p>
+        <p className="mt-3 text-sm text-ink-soft">
+          {order.errorMessage ?? "Something went wrong on our side."}
+        </p>
+        <p className="mt-6 text-sm text-ink-soft">
+          Your $9.9 has been logged for refund. Please reply to your
+          confirmation email or contact <a className="underline" href="mailto:hello@fivebazi.com">hello@fivebazi.com</a> with the order ID below — we'll process the refund within 24 hours.
+        </p>
+        <p className="mt-6 text-xs text-ink-soft font-mono break-all">
           Order: {order.orderId}
+        </p>
+      </div>
+    );
+  }
+
+  // If the bg fn looks stuck (paid > 8 min without progress) surface a softer warning.
+  const elapsedSec = Math.round((Date.now() - order.createdAt) / 1000);
+  if (order.status === "paid" && elapsedSec > 480) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-20 text-center">
+        <p className="text-xs font-medium uppercase tracking-[0.4em] text-gold">
+          ✦ Still working on it ✦
+        </p>
+        <p className="mt-6 font-serif text-2xl text-ink">This is taking longer than usual</p>
+        <p className="mt-3 text-sm text-ink-soft">
+          Generation has been pending for {Math.floor(elapsedSec / 60)} minutes.
+          You can safely close this tab — we'll email when ready. If you don't
+          receive the email within 30 minutes, contact{" "}
+          <a className="underline" href="mailto:hello@fivebazi.com">hello@fivebazi.com</a>{" "}
+          with order <span className="font-mono">{order.orderId}</span>.
         </p>
       </div>
     );
@@ -106,12 +136,30 @@ export default function PremiumReportClient({ orderId }: Props) {
   // Done — render full report. Reconstruct a minimal chart for layout.
   const chart = chartFromOrder(order);
   return (
-    <PremiumReport
-      chart={chart}
-      name={order.name}
-      reading={order.reading}
-      awakenedPortraitPath={order.awakenedPortraitPath}
-    />
+    <>
+      {/* Email confirmation banner */}
+      <div className="mx-auto mt-6 max-w-3xl px-4">
+        <div
+          className="rounded-xl border px-4 py-3 text-sm"
+          style={
+            order.emailSent
+              ? { borderColor: "rgba(94, 123, 86, 0.35)", color: "#3a4f33", background: "rgba(94, 123, 86, 0.08)" }
+              : { borderColor: "rgba(184, 147, 81, 0.4)", color: "#7a5a2f", background: "rgba(184, 147, 81, 0.08)" }
+          }
+        >
+          {order.emailSent
+            ? "✓ A copy of this report has been sent to your email. Bookmark this page to return anytime."
+            : "Note: We couldn't email this report to you (likely a domain restriction). Bookmark this page — it's your permanent link."}
+        </div>
+      </div>
+
+      <PremiumReport
+        chart={chart}
+        name={order.name}
+        reading={order.reading}
+        awakenedPortraitPath={order.awakenedPortraitPath}
+      />
+    </>
   );
 }
 

@@ -9,10 +9,34 @@
  * and sends the delivery email via Resend.
  */
 
+import Stripe from "stripe";
 import { getOrder, updateOrder } from "../../lib/premiumOrder";
 import { calculateBaZi } from "../../lib/bazi";
 import { generatePremiumReading } from "../../lib/premiumReading";
 import { sendPremiumReadyEmail } from "../../lib/premiumEmail";
+
+/**
+ * Refund the order via Stripe. Best-effort: returns true on success, false
+ * otherwise (logged but not thrown).
+ */
+async function refundOrder(orderId: string): Promise<boolean> {
+  const secret = process.env.STRIPE_SECRET_KEY;
+  if (!secret) return false;
+  try {
+    const stripe = new Stripe(secret);
+    // Get the payment_intent for this checkout session, then refund it.
+    const session = await stripe.checkout.sessions.retrieve(orderId);
+    const pi = typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : session.payment_intent?.id;
+    if (!pi) return false;
+    await stripe.refunds.create({ payment_intent: pi, reason: "requested_by_customer" });
+    return true;
+  } catch (err) {
+    console.error("Refund failed:", err);
+    return false;
+  }
+}
 
 export default async (req: Request) => {
   const { orderId } = (await req.json()) as { orderId: string };
@@ -64,9 +88,13 @@ export default async (req: Request) => {
 
     return new Response("", { status: 200 });
   } catch (err) {
+    const message = err instanceof Error ? err.message : "Generation failed";
+    const refunded = await refundOrder(orderId);
     await updateOrder(orderId, {
       status: "error",
-      errorMessage: err instanceof Error ? err.message : "Generation failed",
+      errorMessage: refunded
+        ? `${message} — your $9.9 has been automatically refunded`
+        : `${message} — automatic refund failed; please contact hello@fivebazi.com`,
     });
     return new Response("", { status: 500 });
   }
